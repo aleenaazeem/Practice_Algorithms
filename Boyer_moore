@@ -1,0 +1,56 @@
+#This is the code for Boyer Moore Algorithm
+
+def bad_ch_table(pattern):
+    #This function will create a dictory of letters and their indexes in the
+    #subsequence
+    table = {}
+    length = len(pattern) #this will give the length of the pattern we have
+    for i in range(length):
+        #this will add the letter to the index
+        #key : value in this case pattern[i] == Key and i == value
+        table[pattern[i]] = i
+    return table
+def boyer_moore_search(text,pattern):
+    #this function will take care of every scenario to run the algorithm
+    #We have to take steps
+    ''' Step one set a base case: If pattern has no length or if text has no length
+or pattern is longer than text then return null
+        Step 2
+        We make two pointers shift and j
+        Shift would be used on the text while j would be used on the pattern
+        Step 3
+        Now we loop over the text until we reach n-m which means leaving the length of pattern at the end to check
+        Step 4
+        Have another while loop that will work if the last letter of pattern
+        matches the last letter so we move j to the left
+        Step 5
+        If entire pattern is matched then store the match index
+        We shift the pattern to the right
+        Step 6
+        We have an else condition where if characters dont match then we will compare
+        that character of T with our table and if it isnt there then shift our pointer
+        to the length of j further
+    '''
+    n = len(text)
+    m = len(pattern)
+    if m == 0 or n == 0 or m>n:
+        return []
+    last_occurence = bad_ch_table(pattern)
+    matches = []
+    shift = 0
+    while shift <=n - m:
+        j = m - 1
+        while j >= 0 and pattern[j] == text[shift + j]:
+            j -= 1
+        if j<0:
+            matches.append(shift)
+            shift += (m - last_occurence[pattern[m-1]] if pattern[m-1] in last_occurence else 1)
+        else:
+            bad_char = text[shift + j]
+            last_occ = last_occurence.get(bad_char,-1)
+            shift += max(1,j - last_occ)
+    return matches
+text = "a pattern matching algorithm"
+pattern = "rithm"
+result = boyer_moore_search(text,pattern)
+print("Pattern found at indices:", result)
