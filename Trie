@@ -1,0 +1,55 @@
+class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_end_of_word = False  # Marks end of a word
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+    
+    def insert(self, word):
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end_of_word = True  # Mark last node as a word
+    
+    def search(self, word):
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return node.is_end_of_word  # Return True if it's a complete word
+    
+    def delete(self, word):
+        def helper(node, word, depth):
+            if not node:
+                return False
+            
+            if depth == len(word):
+                if node.is_end_of_word:
+                    node.is_end_of_word = False
+                return len(node.children) == 0  # If node has no children, delete it
+            
+            char = word[depth]
+            if char in node.children:
+                should_delete = helper(node.children[char], word, depth + 1)
+                if should_delete:
+                    del node.children[char]
+                    return len(node.children) == 0
+            return False
+        
+        helper(self.root, word, 0)
+
+# Example Usage
+trie = Trie()
+trie.insert("bear")
+trie.insert("bell")
+trie.insert("bid")
+
+print(trie.search("bear"))  # ✅ True
+print(trie.search("be"))    # ❌ False
+trie.delete("bear")
+print(trie.search("bear"))  # ❌ False
