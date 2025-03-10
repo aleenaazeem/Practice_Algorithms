@@ -1,0 +1,46 @@
+def compute_lps(pattern):
+    """ Computes the Longest Prefix Suffix (LPS) table for KMP algorithm. """
+    m = len(pattern)
+    lps = [0] * m  # Initialize LPS table with 0s
+    j = 0  # Length of previous longest prefix suffix
+    
+    for i in range(1, m):
+        while j > 0 and pattern[i] != pattern[j]:
+            j = lps[j - 1]  # Move j to the previous LPS value
+        
+        if pattern[i] == pattern[j]:
+            j += 1
+            lps[i] = j  # Store the length of the longest prefix suffix
+    
+    return lps
+
+
+def kmp_search(text, pattern):
+    """ Performs KMP search to find pattern in text. """
+    n, m = len(text), len(pattern)
+    lps = compute_lps(pattern)  # Precompute LPS table
+    matches = []
+    i = j = 0  # Pointers for text and pattern
+    
+    while i < n:
+        if text[i] == pattern[j]:  # Character match
+            i += 1
+            j += 1
+            if j == m:  # Full match found
+                matches.append(i - j)
+                j = lps[j - 1]  # Use LPS table to continue search
+        
+        else:  # Mismatch occurs
+            if j > 0:
+                j = lps[j - 1]  # Shift pattern using LPS table
+            else:
+                i += 1  # Move text pointer if no prefix match
+    
+    return matches
+
+
+# Example Usage
+text = "ABABDABABCABAB"
+pattern = "ABABCABAB"
+result = kmp_search(text, pattern)
+print("Pattern found at indices:", result)
